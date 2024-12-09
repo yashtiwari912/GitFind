@@ -16,24 +16,32 @@ const HomePage = () => {
     const getUserProfileAndRepos = useCallback(async (username = "yashtiwari912") => {
         setLoading(true);
         try {
-            //60 requests per hour,5000 requests for authenticated requests
-            const userRes = await fetch(`https://api.github.com/users/${username}`,
-                {
-                    headers: {
-                        authorization: `token ${import.meta.env.VITE_GITHUB_API_KEY}`
-                    },
 
-                });
-            const userProfile = await userRes.json();
-            setUserProfile(userProfile);
-            //Repos
-            const repoRes = await fetch(userProfile.repos_url);
-            const repos = await repoRes.json();
+
+            // const userRes = await fetch(`https://api.github.com/users/${username}`,
+            //     {
+            //         headers: {
+            //             authorization: `token ${import.meta.env.VITE_GITHUB_API_KEY}`
+            //         },
+
+            //     });
+            // const userProfile = await userRes.json();
+            // setUserProfile(userProfile);
+            // //Repos
+            // const repoRes = await fetch(userProfile.repos_url);
+            // const repos = await repoRes.json();
+
+            //now we will call with backend
+            const res = await fetch(`http://localhost:5000/api/users/profile/${username}`);
+            const { repos, userProfile } = await res.json();
+
+
             repos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));//descending order,recent first
-            setRepos(repos);
 
-            console.log("userProfile: ", userProfile);
-            console.log("userRepos: ", repos);
+            setRepos(repos);
+            setUserProfile(userProfile);
+            // console.log("userProfile: ", userProfile);
+            // console.log("userRepos: ", repos);
 
             return { userProfile, repos };
 
